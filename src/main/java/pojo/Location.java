@@ -1,10 +1,10 @@
 package pojo;
 
-public class Coordinates {
+public class Location {
     private final int x;
     private final int y;
 
-    public Coordinates(int x, int y) {
+    public Location(int x, int y) {
         this.x = x;
         this.y = y;
     }
