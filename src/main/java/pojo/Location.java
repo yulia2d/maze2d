@@ -16,4 +16,8 @@ public class Location {
     public int getY() {
         return y;
     }
+
+    public Location add(Location newLocation) {
+        return new Location(x + newLocation.getX(), y + newLocation.getY());
+    }
 }
