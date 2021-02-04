@@ -1,11 +1,11 @@
+import pojo.Maze;
+
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		int r_size = 4;
-		
-		
-
+		Maze maze = new Maze(4, 4);
+		maze.create();
+		System.out.println(maze.toString());
 	}
 
 }
