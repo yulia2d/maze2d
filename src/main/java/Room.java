@@ -8,7 +8,7 @@ public class Room {
 	private Map<Direction, Room> neighbors;
 	private boolean visited;
 	private boolean treasure;
-	private Direction relativeDirection;
+	private Direction relativeDirection; //Used for building the maze
 
 	public Room(Location location) {
 		this.location = location;

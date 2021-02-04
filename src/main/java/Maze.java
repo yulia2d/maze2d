@@ -5,8 +5,8 @@ import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Maze {
-    private int width;
-    private int length;
+    private final int width;
+    private final int length;
     private Room[][] maze;
 
     public Maze(int width, int length) {
@@ -22,13 +22,13 @@ public class Maze {
             throw new IllegalArgumentException("Length should be minimum 4");
         }
         maze = new Room[width][length];
-        for (int x = 0; x < width; x++) {
+        for (int x = 0; x < width; x++) { // Create the maze rooms
             for (int y = 0; y < length; y++) {
                 maze[x][y] = new Room(new Location(x, y));
             }
         }
         EnumSet<Direction> directions = EnumSet.allOf(Direction.class);
-        for (int x = 0; x < width; x++) {
+        for (int x = 0; x < width; x++) { // Set for each room its neighbours
             for (int y = 0; y < length; y++) {
                 for (Direction direction : directions) {
                     Location neighborLocation = maze[x][y].getLocation().add(direction.getValue());
@@ -39,14 +39,17 @@ public class Maze {
             }
         }
 
+        // Random starting point from which to build the maze path
         int randomX = ThreadLocalRandom.current().nextInt(0, width);
         int randomY = ThreadLocalRandom.current().nextInt(0, length);
 
-        Room currentRoom = maze[randomX][randomY]; //Starting room for the create path
+        // Starting room for the create path
+        Room currentRoom = maze[randomX][randomY];
         Stack<Room> path = new Stack<>();
         path.push(currentRoom);
         int unvisitedCount = width * length - 1;
 
+        // For each room that was unvisited (must visit all rooms in the maze)
         while (unvisitedCount > 0) {
             if (path.empty()) {
                 throw new IllegalStateException("path should not be empty");
@@ -55,7 +58,7 @@ public class Maze {
             currentRoom = path.peek();
             currentRoom.setVisited(true);
 
-
+            // For the current room set in its neighbours their relative direction to him
             ArrayList<Room> nextRooms = new ArrayList<>();
             for (Map.Entry<Direction, Room> entry : currentRoom.getNeighbors().entrySet()) {
                 Room neighbor = entry.getValue();
@@ -64,11 +67,14 @@ public class Maze {
                     nextRooms.add(neighbor);
                 }
             }
+
+            // If there are no rooms to go to from the current room, continue with the while loop
             if (nextRooms.size() == 0) {
                 path.pop();
                 continue;
             }
 
+            // Choose randomly the next room to go to
             Room nextRoom = nextRooms.get(ThreadLocalRandom.current().nextInt(0, nextRooms.size()));
             Direction nextRoomRelativeDirection = nextRoom.getRelativeDirection();
             if (!currentRoom.getBorders().get(nextRoomRelativeDirection)) {
@@ -78,7 +84,7 @@ public class Maze {
             currentRoom.setBorderAsDoor(nextRoomRelativeDirection);
             Direction oppositeDirection = nextRoomRelativeDirection.getOppositeDirection();
             if (!nextRoom.getBorder(oppositeDirection)) {
-                throw new IllegalStateException("next cell should not have this border");
+                throw new IllegalStateException("next room should not have this border");
             }
             nextRoom.setBorderAsDoor(oppositeDirection);
             unvisitedCount--;
@@ -112,6 +118,7 @@ public class Maze {
         }
     }
 
+    // Make sure we are in bounds of the maze
     private boolean validLocation(Location location) {
         return (location.getX() >= 0
                 && location.getX() < width
