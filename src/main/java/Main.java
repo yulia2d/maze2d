@@ -1,9 +1,11 @@
+import java.io.IOException;
+
 public class Main {
 
-	public static void main(String[] args) {
-		Maze maze = new Maze(4, 4);
-		maze.create();
-		System.out.println(maze.toString());
+	public static void main(String[] args) throws IOException {
+		Game game = new Game();
+		game.init(4, 4, 1);
+		game.start();
 	}
 
 }

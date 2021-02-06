@@ -44,7 +44,7 @@ public class Room {
 		this.visited = visited;
 	}
 
-	public boolean isTreasure() {
+	public boolean hasTreasure() {
 		return treasure;
 	}
 

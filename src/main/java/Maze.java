@@ -1,13 +1,11 @@
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Maze {
     private final int width;
     private final int length;
     private Room[][] maze;
+    private Location startingPoint;
 
     public Maze(int width, int length) {
         this.width = width;
@@ -116,6 +114,13 @@ public class Maze {
                 }
             }
         }
+
+        startingPoint = new Location(ThreadLocalRandom.current().nextInt(0, width),
+                                     ThreadLocalRandom.current().nextInt(0, length));
+
+        Location treasureLocation = new Location(ThreadLocalRandom.current().nextInt(0, width),
+                                                 ThreadLocalRandom.current().nextInt(0, length));
+        maze[treasureLocation.getX()][treasureLocation.getY()].setTreasure(true);
     }
 
     // Make sure we are in bounds of the maze
@@ -126,14 +131,17 @@ public class Maze {
                 && location.getY() < length);
     }
 
-    @Override
-    public String toString() {
+    public Room getStartingRoom() {
+        return maze[startingPoint.getX()][startingPoint.getY()];
+    }
+
+    public String printMaze(List<Player> players) {
         StringBuilder returnString = new StringBuilder();
-        char[][] cellDrawing = new char[2 * width + 1][2 * length + 1];
+        char[][] roomDrawing = new char[2 * width + 1][2 * length + 1];
 
         for (int y = 0; y < 2 * length; y++) {
             for (int x = 0; x < 2 * width; x++) {
-                cellDrawing[x][y] = ' ';
+                roomDrawing[x][y] = ' ';
             }
         }
         for (int x = 0; x < width; x++) {
@@ -141,26 +149,30 @@ public class Maze {
                 int xOffset = 2 * x;
                 int yOffset = 2 * y;
                 if (maze[x][y].getBorder(Direction.UP)) {
-                    cellDrawing[xOffset][yOffset + 2] =
-                            cellDrawing[xOffset + 1][yOffset + 2] =
-                                    cellDrawing[xOffset + 2][yOffset + 2] = '*';
+                    roomDrawing[xOffset][yOffset + 2] =
+                            roomDrawing[xOffset + 1][yOffset + 2] =
+                                    roomDrawing[xOffset + 2][yOffset + 2] = '*';
                 }
                 if (maze[x][y].getBorder(Direction.RIGHT)) {
-                    cellDrawing[xOffset + 2][yOffset] =
-                            cellDrawing[xOffset + 2][yOffset + 1] =
-                                    cellDrawing[xOffset + 2][yOffset + 2] = '*';
+                    roomDrawing[xOffset + 2][yOffset] =
+                            roomDrawing[xOffset + 2][yOffset + 1] =
+                                    roomDrawing[xOffset + 2][yOffset + 2] = '*';
                 }
                 if (maze[x][y].getBorder(Direction.DOWN)) {
-                    cellDrawing[xOffset][yOffset] =
-                            cellDrawing[xOffset + 1][yOffset] =
-                                    cellDrawing[xOffset + 2][yOffset] = '*';
+                    roomDrawing[xOffset][yOffset] =
+                            roomDrawing[xOffset + 1][yOffset] =
+                                    roomDrawing[xOffset + 2][yOffset] = '*';
                 }
                 if (maze[x][y].getBorder(Direction.LEFT)) {
-                    cellDrawing[xOffset][yOffset] =
-                            cellDrawing[xOffset][yOffset + 1] =
-                                    cellDrawing[xOffset][yOffset + 2] = '*';
+                    roomDrawing[xOffset][yOffset] =
+                            roomDrawing[xOffset][yOffset + 1] =
+                                    roomDrawing[xOffset][yOffset + 2] = '*';
                 }
             }
+        }
+        for(Player player : players){
+            Location location = player.getCurrentRoom().getLocation();
+            roomDrawing[location.getX()][location.getY()] = 'x';
         }
         for (int x = 0; x < 2 * width + 1; x++) {
             returnString.append("*");
@@ -168,7 +180,7 @@ public class Maze {
         returnString.append("\n");
         for (int y = (2 * length) - 1; y >= 0; y--) {
             for (int x = 0; x < 2 * width; x++) {
-                returnString.append(cellDrawing[x][y]);
+                returnString.append(roomDrawing[x][y]);
             }
             returnString.append("*\n");
         }
